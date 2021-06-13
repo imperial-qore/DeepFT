@@ -11,7 +11,7 @@
 
 DeepFT: Self-Supervised Deep Learning based Surrogate Models for Fault-Tolerant Edge Computing.
 
-PreGAN freezes its models as we dont have labaled data at the time of testing. 
+PreGAN freezes its models as we dont have labeled data at the time of testing. 
 But, we can use self-supervised learning to fine-tune the model and transformer model for unsupervised model training. The classification model does not need any true classes, only abstract classes/embeddings. Thus, we can make a model that needs no training/labelled data. It can be trained using unsupervised (for transformers) and self-supervised (for prototype embeddings) so that we can optimize it dynamically. Use this to train a loss -> update scheduling decision using backprop to input. 
 
 
