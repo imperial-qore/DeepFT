@@ -39,8 +39,7 @@ def load_dataset(folder, model):
 
 def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 	path = os.path.join(folder, fname)
-	# if 'Att' in model.name: print(model.prototype)
-	if 'G' in model.name or 'D' in model.name: model.prototype = {}
+	# if 'DeepFT' in model.name: print(model.prototype)
 	torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -60,7 +59,6 @@ def load_model(folder, fname, modelname):
 		model.load_state_dict(checkpoint['model_state_dict'])
 		model.prototype = checkpoint['model_prototypes']
 		for p in model.prototype: p.requires_grad = False
-		# if 'Att' in model.name: print(model.prototype)
 		optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 		epoch = checkpoint['epoch']
 		accuracy_list = checkpoint['accuracy_list']
@@ -68,15 +66,6 @@ def load_model(folder, fname, modelname):
 		print(f"{color.GREEN}Creating new model: {model.name}{color.ENDC}")
 		epoch = -1; accuracy_list = []
 	return model, optimizer, epoch, accuracy_list
-
-def load_gan(folder, gfname, dfname, gmodelname, dmodelname):
-	gmodel, gopt, epoch, accuracy_list = load_model(folder, gfname, gmodelname)
-	dmodel, dopt, _, _ = load_model(folder, dfname, dmodelname)
-	return gmodel, dmodel, gopt, dopt, epoch, accuracy_list
-
-def save_gan(folder, gfname, dfname, gmodel, dmodel, gopt, dopt, epoch, accuracy_list):
-	save_model(folder, gfname, gmodel, gopt, epoch, accuracy_list)
-	save_model(folder, dfname, dmodel, dopt, 0, [])
 
 # Misc
 def normalize_time_data(time_data):

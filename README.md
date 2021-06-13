@@ -29,8 +29,12 @@ But, we can use self-supervised learning to fine-tune the model and transformer 
 ## Pipeline
 
 Joint training of anomaly detection and classification engines. 
-(1) FSP - trained using unsupervised learning using reconstruction loss.
+(1) FSP - trained using unsupervised learning using reconstruction loss. 
+	- co-simulated self-supervision.
+	- joint training
 (2) PEN - trained using 1 class for no-fault (NAP), k classes for faults (kP).
+	- autoregressive training
+	- factored prediction
 
 Testing.
 - loss = Fault score + Delta(P - NAP)
