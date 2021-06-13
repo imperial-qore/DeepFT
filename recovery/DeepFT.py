@@ -9,12 +9,11 @@ from .DeepFTSrc.src.utils import *
 from .DeepFTSrc.src.train import *
 
 class DeepFTRecovery(Recovery):
-    def __init__(self, hosts, env, training = False):
+    def __init__(self, hosts, env):
         super().__init__()
         self.model_name = f'DeepFT_{hosts}'
         self.hosts = hosts
         self.env_name = 'simulator' if env == '' else 'framework'
-        self.training = training
         self.load_model()
 
     def load_model(self):
@@ -25,13 +24,6 @@ class DeepFTRecovery(Recovery):
         if self.epoch == -1: self.train_model()
         # Freeze encoder
         freeze(self.model)
-        # Load generator and discriminator
-        self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list = \
-            load_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', self.gen_name, self.disc_name) 
-        self.gan_plotter = GAN_Plotter(self.env_name, self.gen_name, self.disc_name, self.training)
-        # Freeze GAN if not training
-        if not self.training: freeze(self.gen); freeze(self.disc)
-        if self.training:  self.ganloss = nn.BCELoss()
         self.train_time_data = load_npyfile(os.path.join(data_folder, self.env_name), data_filename)
 
     def train_model(self):
