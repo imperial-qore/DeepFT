@@ -1,25 +1,23 @@
 import sys
-sys.path.append('recovery/PreGANSrc/')
+sys.path.append('recovery/DeepFTSrc/')
 
 import numpy as np
 from copy import deepcopy
 from .Recovery import *
-from .PreGANSrc.src.constants import *
-from .PreGANSrc.src.utils import *
-from .PreGANSrc.src.train import *
+from .DeepFTSrc.src.constants import *
+from .DeepFTSrc.src.utils import *
+from .DeepFTSrc.src.train import *
 
-class PreGANRecovery(Recovery):
+class DeepFTRecovery(Recovery):
     def __init__(self, hosts, env, training = False):
         super().__init__()
-        self.model_name = f'Attention_{hosts}'
-        self.gen_name = f'Gen_{hosts}'
-        self.disc_name = f'Disc_{hosts}'
+        self.model_name = f'DeepFT_{hosts}'
         self.hosts = hosts
         self.env_name = 'simulator' if env == '' else 'framework'
         self.training = training
-        self.load_models()
+        self.load_model()
 
-    def load_models(self):
+    def load_model(self):
         # Load encoder model
         self.model, self.optimizer, self.epoch, self.accuracy_list = \
             load_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model_name)
@@ -47,28 +45,6 @@ class PreGANRecovery(Recovery):
             self.accuracy_list.append((loss, factor, anomaly_score, class_score))
             self.model_plotter.plot(self.accuracy_list, self.epoch)
             save_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
-
-    def train_gan(self, embedding, schedule_data):
-        # Train discriminator
-        self.disc.zero_grad()
-        new_schedule_data = self.gen(embedding, schedule_data)
-        probs = self.disc(schedule_data, new_schedule_data.detach())
-        new_score, orig_score = run_simulation(self.env.stats, new_schedule_data), run_simulation(self.env.stats, schedule_data)
-        true_probs = torch.tensor([0, 1], dtype=torch.double) if new_score <= orig_score else torch.tensor([1, 0], dtype=torch.double)
-        disc_loss = self.ganloss(probs, true_probs.detach().clone())
-        disc_loss.backward(); self.dopt.step()
-        # Train generator
-        self.gen.zero_grad()
-        probs = self.disc(schedule_data, new_schedule_data)
-        true_probs = torch.tensor([0, 1], dtype=torch.double) # to enforce new schedule is better than original schedule
-        gen_loss = self.ganloss(probs, true_probs)
-        gen_loss.backward(); self.gopt.step()
-        # Append to accuracy list
-        self.epoch += 1; self.accuracy_list.append((gen_loss.item(), disc_loss.item()))
-        print(f'{color.HEADER}Epoch {self.epoch},\tGLoss = {gen_loss.item()},\tDLoss = {disc_loss.item()}{color.ENDC}')
-        self.gan_plotter.plot(self.accuracy_list, self.epoch, new_score, orig_score)
-        save_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', \
-                self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list)
 
     def recover_decision(self, embedding, schedule_data, original_decision):
         new_schedule_data = self.gen(embedding, schedule_data)
