@@ -35,6 +35,7 @@ Joint training of anomaly detection and classification engines.
 Testing.
 - loss = Fault score + Delta(P - NAP)
 - S <- S - gamma * Nabla_S (loss)
+
 Run till convergence or Fault Score < threshold.
 
 ## Implementation Details
