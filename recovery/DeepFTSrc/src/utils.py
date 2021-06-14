@@ -72,6 +72,14 @@ def load_model(folder, fname, modelname):
 		epoch = -1; accuracy_list = []
 	return model, optimizer, epoch, accuracy_list
 
+def convertToOneHot(dat, cpu_old, HOSTS):
+    alloc = []
+    for i in dat:
+        oneHot = [0] * HOSTS; alist = i.tolist()[-HOSTS:]
+        oneHot[alist.index(max(alist))] = 1; alloc.append(oneHot)
+    new_dat_oneHot = torch.cat((cpu_old, torch.FloatTensor(alloc)), dim=1)
+    return new_dat_oneHot
+
 # Misc
 def normalize_time_data(time_data):
 	return time_data / (np.max(time_data, axis = 0) + 1e-8) 

@@ -111,3 +111,11 @@ def accuracy(model, train_time_data, train_schedule_data, anomaly_data, class_da
 	tqdm.write(f'P = {p}, R = {r}, F1 = {2 * p * r / (p + r)}')
 	return anomaly_correct / len(train_time_data), class_correct / class_total
 
+# Optimization loss
+def optimization_loss(pred_state, prototypes, thresholds):
+	anomaly_any_dim, _ = check_anomalies(pred_state.view(1, -1).detach().clone().numpy(), thresholds)
+	anomaly_any_dim = anomaly_any_dim[0] + 0
+	end = np.sum(anomaly_any_dim) == 0
+	z = pred_state - torch.tensor(thresholds, dtype=torch.double)
+	z = torch.mean(torch.nn.ReLU(True)(z))
+	return z, end

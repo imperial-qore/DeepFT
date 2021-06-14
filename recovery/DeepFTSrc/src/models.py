@@ -16,7 +16,7 @@ class DeepFT_16(nn.Module):
 		self.n_hidden = 16
 		self.n = self.n_window * self.n_feats + self.n_hosts * self.n_hosts
 		self.encoder = nn.Sequential(
-			nn.Linear(self.n_window * self.n_feats, self.n_hosts * self.n_latent), nn.LeakyReLU(True),
+			nn.Linear(self.n_window * self.n_feats + self.n_hosts ** 2, self.n_hosts * self.n_latent), nn.LeakyReLU(True),
 		)
 		self.state_decoder = nn.Sequential(
 			nn.Linear(self.n_latent, self.n_hidden), nn.LeakyReLU(True),
@@ -31,7 +31,7 @@ class DeepFT_16(nn.Module):
 		# 0th : no anomaly, rest: kth anomaly
 
 	def encode(self, t, s):
-		t = self.encoder(t.view(-1)).view(self.n_hosts, self.n_latent)	
+		t = self.encoder(torch.cat((t.view(-1), s.view(-1)))).view(self.n_hosts, self.n_latent)	
 		return t
 
 	def state_decode(self, t):

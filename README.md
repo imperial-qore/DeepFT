@@ -47,6 +47,7 @@ Run till convergence or Fault Score < threshold.
 
 ## Figures and Comparisons
 
+- Decrease and convergence of optimization loss
 
 ## License
 
