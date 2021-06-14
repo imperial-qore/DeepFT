@@ -194,9 +194,9 @@ class Stats():
 				host_alloc[hid].append(cid)
 		cpulist, ramlist, disklist = [0]*len(self.env.hostlist), [0]*len(self.env.hostlist), [0]*len(self.env.hostlist)
 		for hid, cids in enumerate(host_alloc):
-			cpulist[hid] = np.sum([(100 * (self.containerlist[cid].getApparentIPS() / self.hostlist[hid].ipsCap)) for cid in cids])
-			ramlist[hid] = np.sum([self.containerlist[cid].getRAM()[0] for cid in cids])
-			disklist[hid] = np.sum([self.containerlist[cid].getDisk()[0] for cid in cids])
+			cpulist[hid] = np.sum([(100 * (self.env.containerlist[cid].getApparentIPS() / self.env.hostlist[hid].ipsCap)) for cid in cids])
+			ramlist[hid] = np.sum([self.env.containerlist[cid].getRAM()[0] for cid in cids])
+			disklist[hid] = np.sum([self.env.containerlist[cid].getDisk()[0] for cid in cids])
 		datapoint = np.concatenate([[cpulist[i], ramlist[i], disklist[i]] for i in range(len(cpulist))]).reshape(1, -1)
 		return datapoint
 

@@ -110,7 +110,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be Recovery, DeepFTRecovery '''
-	recovery = Recovery()
+	recovery = DeepFTRecovery(HOSTS, environment)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

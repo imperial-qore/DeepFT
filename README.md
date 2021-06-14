@@ -18,7 +18,7 @@ Can be extended to semi-supervised = dynamically fine-tune using teacher forcing
 Dual-headed neural model for parameter sharing and generalization.
 1. State Encoder
 2. Decision Encoder
-3. Fault Score Predictor (FSP)
+3. State Decoder (SD)
 4. Prototype Embedding Network (PEN)
 
 ## Motivation
@@ -29,7 +29,7 @@ But, we can use self-supervised learning to fine-tune the model and transformer 
 ## Pipeline
 
 Joint training of anomaly detection and classification engines. 
-1. FSP - trained using unsupervised learning using reconstruction loss. 
+1. SD - trained using unsupervised learning using reconstruction loss. 
 	- co-simulated self-supervision.
 	- joint training
 2. PEN - trained using 1 class for no-fault (NAP), k classes for faults (kP).

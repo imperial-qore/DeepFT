@@ -13,15 +13,20 @@ def convert_to_windows(data, model):
 		windows.append(w)
 	return torch.stack(windows)
 
-def form_test_dataset(data):
-	anomaly_per_dim = data > np.percentile(data, PERCENTILES, axis=0)
+def check_anomalies(data, thresholds):
+	anomaly_per_dim = data > thresholds
 	anomaly_which_dim, anomaly_any_dim = [], []
 	for i in range(0, data.shape[1], 3):
 		anomaly_which_dim.append(np.argmax(data[:, i:i+3] + 0, axis=1))
 		anomaly_any_dim.append(np.logical_or.reduce(anomaly_per_dim[:, i:i+3], axis=1))
 	anomaly_any_dim = np.stack(anomaly_any_dim, axis=1)
 	anomaly_which_dim = np.stack(anomaly_which_dim, axis=1)
-	return anomaly_any_dim + 0, anomaly_which_dim
+	return anomaly_any_dim, anomaly_which_dim
+
+def form_test_dataset(data):
+	thresholds = np.percentile(data, PERCENTILES, axis=0)
+	anomaly_any_dim, anomaly_which_dim = check_anomalies(data, thresholds)
+	return anomaly_any_dim + 0, anomaly_which_dim, thresholds
 
 def load_npyfile(folder, fname):
 	path = os.path.join(folder, fname)
@@ -34,8 +39,8 @@ def load_dataset(folder, model):
 	time_data = normalize_time_data(time_data) # Normalize data
 	train_schedule_data = torch.tensor(load_npyfile(folder, schedule_filename)).double()
 	train_time_data = convert_to_windows(time_data, model)
-	anomaly_data, class_data = form_test_dataset(time_data)
-	return train_time_data, train_schedule_data, anomaly_data, class_data
+	anomaly_data, class_data, thresholds = form_test_dataset(time_data)
+	return train_time_data, train_schedule_data, anomaly_data, class_data, thresholds
 
 def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 	path = os.path.join(folder, fname)
@@ -48,9 +53,9 @@ def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
         'accuracy_list': accuracy_list}, path)
 
 def load_model(folder, fname, modelname):
-	import recovery.PreGANSrc.src.models
+	import recovery.DeepFTSrc.src.models
 	path = os.path.join(folder, fname)
-	model_class = getattr(recovery.PreGANSrc.src.models, modelname)
+	model_class = getattr(recovery.DeepFTSrc.src.models, modelname)
 	model = model_class().double()
 	optimizer = torch.optim.AdamW(model.parameters() , lr=model.lr, weight_decay=1e-5)
 	if os.path.exists(path):
@@ -75,9 +80,8 @@ def normalize_test_time_data(time_data, train_time_data):
 	return (time_data / (np.max(train_time_data, axis = 0) + 1e-8))
 
 def run_simulation(stats, schedule_data):
-    e, r = stats.runSimulation(schedule_data)
-    score = Coeff_Energy * e + Coeff_Latency * r
-    return score
+    datapoint = stats.runStateSimulation(schedule_data)
+    return datapoint
 
 def get_classes(embeddings, model):
 	class_list = []

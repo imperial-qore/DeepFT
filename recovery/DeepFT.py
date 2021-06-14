@@ -14,27 +14,28 @@ class DeepFTRecovery(Recovery):
         self.model_name = f'DeepFT_{hosts}'
         self.hosts = hosts
         self.env_name = 'simulator' if env == '' else 'framework'
-        self.load_model()
+        self.model_loaded = False
 
     def load_model(self):
+        # Load training time series
+        self.train_time_data = load_npyfile(os.path.join(data_folder, self.env_name), data_filename)
         # Load encoder model
         self.model, self.optimizer, self.epoch, self.accuracy_list = \
             load_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model_name)
         # Train the model is not trained
         if self.epoch == -1: self.train_model()
         # Freeze encoder
-        freeze(self.model)
-        self.train_time_data = load_npyfile(os.path.join(data_folder, self.env_name), data_filename)
+        freeze(self.model); self.model_loaded = True; exit()
 
     def train_model(self):
         self.model_plotter = Model_Plotter(self.env_name, self.model_name)
-        folder = os.path.join(data_folder, self.env_name)
-        train_time_data, train_schedule_data, anomaly_data, class_data = load_dataset(folder, self.model)
+        folder = os.path.join(data_folder, self.env_name); norm_series = self.train_time_data
+        train_time_data, train_schedule_data, anomaly_data, class_data, thresholds = load_dataset(folder, self.model)
         for self.epoch in tqdm(range(self.epoch+1, self.epoch+num_epochs+1), position=0):
-            loss, factor = backprop(self.epoch, self.model, train_time_data, train_schedule_data, anomaly_data, class_data, self.optimizer)
-            anomaly_score, class_score = accuracy(self.model, train_time_data, train_schedule_data, anomaly_data, class_data, self.model_plotter)
+            aloss, tloss, factor = backprop(self.epoch, self.model, self.optimizer, train_time_data, train_schedule_data, self.env.stats, norm_series, thresholds)
+            anomaly_score, class_score = accuracy(self.model, train_time_data, train_schedule_data, anomaly_data, class_data, thresholds, self.model_plotter)
             tqdm.write(f'Epoch {self.epoch},\tFactor = {factor},\tAScore = {anomaly_score},\tCScore = {class_score}')
-            self.accuracy_list.append((loss, factor, anomaly_score, class_score))
+            self.accuracy_list.append((aloss, tloss, factor, anomaly_score, class_score))
             self.model_plotter.plot(self.accuracy_list, self.epoch)
             save_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
 
@@ -71,6 +72,7 @@ class DeepFTRecovery(Recovery):
         return self.model(time_data, schedule_data)
 
     def run_model(self, time_series, original_decision):
+        if not self.model_loaded: self.load_model()
         # Run encoder
         schedule_data = torch.tensor(self.env.scheduler.result_cache).double()
         anomaly, prototype = self.run_encoder(schedule_data)
