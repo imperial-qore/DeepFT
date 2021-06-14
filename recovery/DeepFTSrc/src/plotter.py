@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import statistics
 import os, glob
+import random
 import numpy as np
 from sklearn.manifold import TSNE
 import seaborn as sns
@@ -74,6 +75,7 @@ class Model_Plotter():
 		self.source_anomaly_scores = np.array(self.source_anomaly_scores)
 		self.target_anomaly_scores = np.array(self.target_anomaly_scores)
 		self.plot_heatmap('Anomaly Scores', 'Prediction', 'Ground Truth', self.source_anomaly_scores, self.target_anomaly_scores)
+		self.protoypes = random.choices(self.protoypes, k = 200)
 		X = [i[0].tolist() for i in self.protoypes]; Y = np.array([i[1] for i in self.protoypes])
 		x2d = self.tsne.fit_transform(X)
 		self.plot_tsne('Prototypes', x2d, Y)
