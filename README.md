@@ -46,7 +46,7 @@ class to which the prediction is closest.
 Testing. At test time we dont have W' so we use co-simulated self-supervision to generate W' and then the 
 fault score. Also, we dont want to consider those hosts which have downward spikes. So we calculate
 fault-score for each host i. And take dot-product with ReLU (W' > W").
-- loss = \Sum\_i (MSE(W'\_i, W"\_i) i + Delta(P - NAP) i) . ReLU(W'\_i > W"\_i)
+- loss = \Sum\_i (MSE(W'\_i, W"\_i) + Delta(P - NAP)\_i) . ReLU(W'\_i > W"\_i)
 - S <- S - gamma * Nabla_S (loss)
 
 Run till convergence or Fault Score < threshold.
