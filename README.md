@@ -29,25 +29,36 @@ But, we can use self-supervised learning to fine-tune the model and transformer 
 ## Pipeline
 
 Joint training of anomaly detection and classification engines. 
+At training time, we have a dataset of W and W' (next window).
 1. SD - trained using unsupervised learning using reconstruction loss. 
-	- co-simulated self-supervision.
+	- reconstruction loss from W' (reconstructed output = W") = MSE(W', W")
+	- reconstruct each dimension (i.e. each host feature vector independently)
 	- joint training
 2. PEN - trained using 1 class for no-fault (NAP), k classes for faults (kP).
-	- autoregressive training
-	- factored prediction
+	- autoregressive training (in that epoch, use POT to generate autoregressive fault labels)
+	- trained using triplet loss
+	- factored prediction (predict for each host - makes it agnostic to num hosts)
 
-Testing.
-- loss = Fault score + Delta(P - NAP)
+Autoregressive labelling: ! (Fault Score > POT and W' > W") -> means suddent upward spike.
+Downward spiked are not considered anomalous. If the above is true then NAP is ground-truth else the kP
+class to which the prediction is closest.
+
+Testing. At test time we dont have W' so we use co-simulated self-supervision to generate W' and then the 
+fault score. Also, we dont want to consider those hosts which have downward spikes. So we calculate
+fault-score for each host i. And take dot-product with ReLU (W' > W").
+- loss = \Sum\_i (MSE(W'\_i, W"\_i) i + Delta(P - NAP) i) . ReLU(W'\_i > W"\_i)
 - S <- S - gamma * Nabla_S (loss)
 
 Run till convergence or Fault Score < threshold.
 
 ## Implementation Details
 
+- Each prototype is (mu, sigma) as NAP is much more dense than other classes. Thus, we use Bregmann distance as
+our Delta function in the triplet loss and the optimization loss.
 
 ## Figures and Comparisons
 
-- Decrease and convergence of optimization loss
+- Decrease and convergence of the optimization loss
 
 ## License
 
