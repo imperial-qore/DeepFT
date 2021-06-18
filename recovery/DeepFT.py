@@ -11,22 +11,23 @@ from .DeepFTSrc.src.train import *
 class DeepFTRecovery(Recovery):
     def __init__(self, hosts, env):
         super().__init__()
-        self.model_name = f'DeepFT_{hosts}'
         self.hosts = hosts
-        self.env_name = 'simulator' if env == '' else 'framework'
+        self.env_name = 'framework'
+        self.model_name = f'DeepFT_{self.env_name}_{hosts}'
         self.model_loaded = False
 
     def load_model(self):
         # Load training time series and thresholds
-        self.train_time_data = load_npyfile(os.path.join(data_folder, self.env_name), data_filename)
-        self.thresholds = np.percentile(self.train_time_data, PERCENTILES, axis=0)
+        self.train_time_data = normalize_time_data(np.load(data_folder + self.env_name + '/' + data_filename))
+        self.thresholds = np.percentile(self.train_time_data, PERCENTILES, axis=0) 
+        if self.env_name == 'simulator': self.thresholds *= percentile_multiplier
         # Load encoder model
         self.model, self.optimizer, self.epoch, self.accuracy_list = \
-            load_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model_name)
+            load_model(model_folder, f'{self.model_name}.ckpt', self.model_name)
         # Train the model is not trained
         if self.epoch == -1: self.train_model()
         # Freeze encoder
-        freeze(self.model); self.model_loaded = True
+        freeze(self.model); self.model_loaded = True; exit()
 
     def train_model(self):
         self.model_plotter = Model_Plotter(self.env_name, self.model_name)
@@ -38,7 +39,7 @@ class DeepFTRecovery(Recovery):
             tqdm.write(f'Epoch {self.epoch},\tFactor = {factor},\tAScore = {anomaly_score},\tCScore = {class_score}')
             self.accuracy_list.append((aloss, tloss, factor, anomaly_score, class_score))
             self.model_plotter.plot(self.accuracy_list, self.epoch)
-            save_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
+            save_model(model_folder, f'{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
 
     def optimize_decision(self, state, original_decision):
         init = torch.tensor(deepcopy(original_decision), dtype=torch.double, requires_grad=True)

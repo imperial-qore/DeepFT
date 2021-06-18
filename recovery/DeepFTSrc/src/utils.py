@@ -24,7 +24,8 @@ def check_anomalies(data, thresholds):
 	return anomaly_any_dim, anomaly_which_dim
 
 def form_test_dataset(data):
-	thresholds = np.percentile(data, PERCENTILES, axis=0)
+	thresholds = np.percentile(data, PERCENTILES, axis=0) 
+	if 1 - max(thresholds) < 1e-5: thresholds *= percentile_multiplier
 	anomaly_any_dim, anomaly_which_dim = check_anomalies(data, thresholds)
 	return anomaly_any_dim + 0, anomaly_which_dim, thresholds
 
@@ -57,7 +58,7 @@ def load_model(folder, fname, modelname):
 	path = os.path.join(folder, fname)
 	model_class = getattr(recovery.DeepFTSrc.src.models, modelname)
 	model = model_class().double()
-	optimizer = torch.optim.AdamW(model.parameters() , lr=model.lr, weight_decay=1e-5)
+	optimizer = torch.optim.Adam(model.parameters() , lr=model.lr, weight_decay=1e-5)
 	if os.path.exists(path):
 		print(f"{color.GREEN}Loading pre-trained model: {model.name}{color.ENDC}")
 		checkpoint = torch.load(path)

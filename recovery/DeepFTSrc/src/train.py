@@ -46,7 +46,7 @@ def backprop(epoch, model, optimizer, train_time_data, train_schedule_data, stat
 		true_state = run_simulation(stats, schedule)
 		true_state = normalize_test_time_data(true_state, norm_series)
 		aloss, tloss = custom_loss(model, pred_state, prototypes, state, thresholds) # true_state
-		aloss_list.append(aloss.item()); tloss_list.append(tloss.item())
+		aloss_list.append(aloss.item()); tloss_list.append(0.01*tloss.item())
 		loss = aloss + 0.01 * tloss
 		if training:
 			optimizer.zero_grad(); loss.backward(); optimizer.step()

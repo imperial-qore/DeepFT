@@ -8,6 +8,7 @@ schedule_filename = 'schedule_series.npy'
 # Hyperparameters
 num_epochs = 35
 PERCENTILES = 98
+percentile_multiplier = 0.99999
 PROTO_DIM = 2
 PROTO_UPDATE_FACTOR = 0.2
 PROTO_UPDATE_MIN = 0.02
