@@ -12,7 +12,7 @@ if 'Windows' in platform.system():
 
 system('python3 -m pip install matplotlib')
 system('python3 -m pip install -r requirements.txt')
-system('python3 -m pip install -U scikit-learn')
+system('python3 -m pip install -U scikit-learn==0.23.2')
 system('python3 -m pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
 
 import wget
