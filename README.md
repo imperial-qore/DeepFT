@@ -46,7 +46,7 @@ class to which the prediction is closest.
 Testing. At test time we dont have W' so we use co-simulated self-supervision to generate W' and then the 
 fault score. Also, we dont want to consider those hosts which have downward spikes. So we calculate
 fault-score for each host i. And take dot-product with ReLU (W' > W").
-- loss = \Sum\_i (MSE(W'\_i, W"\_i) + Delta(P - NAP)\_i) . ReLU(W'\_i > W"\_i)
+- loss = \Sum\_i (MSE(W'\_i, W"\_i) + Delta(P - NAP)\_i)) . ReLU(W'\_i > W"\_i)
 - S <- S - gamma * Nabla_S (loss)
 
 Run till convergence or Fault Score < threshold.
@@ -58,7 +58,45 @@ our Delta function in the triplet loss and the optimization loss.
 
 ## Figures and Comparisons
 
-- Decrease and convergence of the optimization loss
+- Model Diagram (Figure): SE, SD, DE, PEN.
+
+- System model
+
+- Visualization of attention scores (Plot):
+	- Truncated (say 3 dimensions time-series data)
+	- True series, Predicted Series, True Anomaly
+	- Colormap of attention scores
+	- Anomaly Scores and anomaly predictions
+
+- RPi Cluster
+
+- tSNE visualization of class prototypes (Plot):
+	- For different values of k
+
+- Loss and accuracy curves for DeepFT Model (Plot) with iterations:
+	- Anomaly prediction score
+	- P, R, F1
+	- HitRate, NDCG
+
+- Decrease and convergence of the optimization loss (GIF):
+	- Reduction in optimization loss, change in prototype vector (with iterations)
+
+- Performance Scores (Table):
+	- Acc, P, R, F1, HR, NDCG, Improvement Ratio
+
+- QoS Plots (Plot):
+	- Response time, energy, sla, preemptive migrations, anomalies (each class). Overheads.
+
+- Ablation Study (Table):
+	- F1, Improvement Ratio, SLA-v, Energy
+	- wo PEN, k = 1, wo stochastic prototype, wo DE
+
+- Senstivity Analysis of QoS using simulator (Plot) :
+	- QoS with workloads. (energy, sla, Improvement ratio, f1)
+
+- Sensitivity Analysis of Detection using simulator (Plots) :
+	- detection/diagnosis/classification with window size, prototype dimension, k, factor.
+
 
 ## License
 
