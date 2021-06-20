@@ -53,6 +53,9 @@ from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 # Recovery imports
 from recovery.Recovery import Recovery
 from recovery.DeepFT import DeepFTRecovery
+from recovery.TopoMAD import TopoMADRecovery
+from recovery.PCFT import PCFTRecovery
+from recovery.AWGG import AWGGRecovery
 
 # Auxiliary imports
 from stats.Stats import *
@@ -109,8 +112,8 @@ def initalizeEnvironment(environment, logger):
 	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
-	''' Can be Recovery, DeepFTRecovery '''
-	recovery = DeepFTRecovery(HOSTS, environment)
+	''' Can be Recovery, DeepFTRecovery, PCFTRecovery, TopoMADRecovery '''
+	recovery = AWGGRecovery(HOSTS, environment)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

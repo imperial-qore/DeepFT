@@ -12,7 +12,7 @@ class DeepFTRecovery(Recovery):
     def __init__(self, hosts, env):
         super().__init__()
         self.hosts = hosts
-        self.env_name = 'framework'
+        self.env_name = 'simulator' if env == '' else 'framework'
         self.model_name = f'DeepFT_{self.env_name}_{hosts}'
         self.model_loaded = False
 
@@ -27,7 +27,7 @@ class DeepFTRecovery(Recovery):
         # Train the model is not trained
         if self.epoch == -1: self.train_model()
         # Freeze encoder
-        freeze(self.model); self.model_loaded = True; exit()
+        freeze(self.model); self.model_loaded = True
 
     def train_model(self):
         self.model_plotter = Model_Plotter(self.env_name, self.model_name)
