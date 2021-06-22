@@ -115,7 +115,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be Recovery, DeepFTRecovery, PCFTRecovery, TopoMADRecovery, DFTMRecovery, ECLBRecovery, AWGGRecovery '''
-	recovery = TopoMADRecovery(HOSTS, environment)
+	recovery = AWGGRecovery(HOSTS, environment)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
