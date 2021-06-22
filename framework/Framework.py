@@ -204,6 +204,12 @@ class Framework():
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
 				containerIDsAllocated.append(cid)
 				migrations.append((cid, hid))
+				# Update RAM usages for getPlacementPossible()
+				container = self.getContainerByID(cid)
+				ram_usage, _, _ = container.getRAM()
+				if container.hostid != -1:
+					self.getHostByID(container.hostid).ram.size -= ram_usage
+				self.getHostByID(hid).ram.size += ram_usage
 		Parallel(n_jobs=num_cores, backend='threading')(delayed(self.parallelizedFunc)(i) for i in migrations)
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
