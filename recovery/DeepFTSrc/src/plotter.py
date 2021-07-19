@@ -60,7 +60,7 @@ class Model_Plotter():
 		self.epoch = epoch; self.prefix2 = self.prefix + '_' + str(self.epoch) + '_'
 		self.pred_line, self.true_line = np.array(self.pred_line).transpose(), np.array(self.true_line).transpose()
 		self.aloss_list = [i[0] for i in accuracy_list]
-		self.tloss_list = [i[1] for i in accuracy_list]
+		self.tloss_list = [- i[1] for i in accuracy_list]
 		self.loss_list = [i[0]+i[1] for i in accuracy_list]
 		self.factor_list = [i[2] for i in accuracy_list]
 		self.anomaly_score_list = [i[3] for i in accuracy_list]
@@ -92,7 +92,7 @@ class Model_Plotter():
 
 	def plot2(self, name1, name2, data1, data2, smooth = True, xlabel='Epoch'):
 		if smooth: data1, data2 = smoother(data1), smoother(data2)
-		fig, ax = plt.subplots(1, 1, figsize=(3,1.9))
+		fig, ax = plt.subplots(1, 1, figsize=(2,1.9))
 		ax.set_ylabel(name1); ax.set_xlabel(xlabel)
 		l1 = ax.plot(data1, linewidth=0.6, label=name1, c = 'red')
 		ax2 = ax.twinx()

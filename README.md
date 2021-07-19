@@ -58,40 +58,40 @@ our Delta function in the triplet loss and the optimization loss.
 
 ## Figures and Comparisons
 
-- Model Diagram (Figure): SE, SD, DE, PEN.
+- @Model Diagram (Figure): SE, SD, DE, PEN.
 
-- System model
+- @System model
 
-- Visualization of attention scores (Plot):
+- @Visualization of attention scores (Plot):
 	- Truncated (say 3 dimensions time-series data)
 	- True series, Predicted Series, True Anomaly
 	- Colormap of attention scores
 	- Anomaly Scores and anomaly predictions
 
-- RPi Cluster
+- @RPi Cluster
 
-- tSNE visualization of class prototypes (Plot):
+- @tSNE visualization of class prototypes (Plot):
 	- For different values of k
 
-- Loss and accuracy curves for DeepFT Model (Plot) with iterations:
+- @Loss and accuracy curves for DeepFT Model (Plot) with iterations:
 	- Anomaly prediction score
 	- P, R, F1
 	- HitRate, NDCG
 
-- Decrease and convergence of the optimization loss (GIF):
+- @Decrease and convergence of the optimization loss (GIF):
 	- Reduction in optimization loss, change in prototype vector (with iterations)
 
-- Performance Scores (Table):
-	- Acc, P, R, F1, HR, NDCG, Improvement Ratio
+- @Performance Scores (Table):
+	- Acc, P, R, F1, HR, NDCG, Improvement Ratio, Overhead ratio
 
-- QoS Plots (Plot):
+- @QoS Plots (Plot):
 	- Response time, energy, sla, preemptive migrations, anomalies (each class). Overheads.
 
 - Ablation Study (Table):
 	- F1, Improvement Ratio, SLA-v, Energy
 	- wo PEN, k = 1, wo stochastic prototype, wo DE
 
-- Senstivity Analysis of QoS using simulator (Plot) :
+- @Senstivity Analysis of QoS using simulator (Plot) :
 	- QoS with workloads. (energy, sla, Improvement ratio, f1)
 
 - Sensitivity Analysis of Detection using simulator (Plots) :
