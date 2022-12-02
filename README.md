@@ -7,101 +7,50 @@
 ![Docker pulls pocketsphinx](https://img.shields.io/docker/pulls/shreshthtuli/pocketsphinx?label=docker%20pulls%3A%20pocketsphinx)
 ![Docker pulls aeneas](https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas)
 
-# DeepFT
+## Quick Test
+Clone repo.
+```console
+git clone https://github.com/imperial-qore/PreGAN.git
+cd PreGAN/
+```
+Install dependencies.
+```console
+sudo apt -y update
+python3 -m pip --upgrade pip
+python3 -m pip install matplotlib scikit-learn
+python3 -m pip install -r requirements.txt
+python3 -m pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
+export PATH=$PATH:~/.local/bin
+```
+Change line 118 in `main.py` to use one of the implemented fault-tolerance techniques: `DeepFTRecovery`, `PCFTRecovery`, `DFTMRecovery`, `ECLBRecovery`,  `AWGGRecovery` or `TopoMADRecovery` and run the code using the following command.
+```console
+python3 main.py
+````
 
-DeepFT: Self-Supervised Deep Learning based Surrogate Models for Fault-Tolerant Edge Computing.
+## External Links
+| Items | Contents | 
+| --- | --- |
+| **Pre-print** | (coming soon) |
+| **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
+| **Funding**| Imperial President's scholarship |
 
-Can be extended to semi-supervised = dynamically fine-tune using teacher forcing (need to solve the exposure bias problem).
+## Cite this work
+Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2023. Cite our work using the bibtex entry below.
+```bibtex
+@inproceedings{tuli2022deepft,
+  title={{DeepFT: Fault-Tolerant Edge Computing using a Self-Supervised Deep Surrogate Model}},
+  author={Tuli, Shreshth and Casale, Giuliano and Cherkasova, Ludmila and Jennings, Nicholas R},
+  booktitle={IEEE Conference on Computer Communications (INFOCOM)},
+  year={2023},
+  organization={IEEE}
+}
 
-
-## Model
-Dual-headed neural model for parameter sharing and generalization.
-1. State Encoder
-2. Decision Encoder
-3. State Decoder (SD)
-4. Prototype Embedding Network (PEN)
-
-## Motivation
-
-PreGAN freezes its models as we dont have labeled data at the time of testing. 
-But, we can use self-supervised learning to fine-tune the model and transformer model for unsupervised model training. The classification model does not need any true classes, only abstract classes/embeddings. Thus, we can make a model that needs no training/labelled data. It can be trained using unsupervised (for transformers) and self-supervised (for prototype embeddings) so that we can optimize it dynamically. Use this to train a loss -> update scheduling decision using backprop to input. 
-
-## Pipeline
-
-Joint training of anomaly detection and classification engines. 
-At training time, we have a dataset of W and W' (next window).
-1. SD - trained using unsupervised learning using reconstruction loss. 
-	- reconstruction loss from W' (reconstructed output = W") = MSE(W', W")
-	- reconstruct each dimension (i.e. each host feature vector independently)
-	- joint training
-2. PEN - trained using 1 class for no-fault (NAP), k classes for faults (kP).
-	- autoregressive training (in that epoch, use POT to generate autoregressive fault labels)
-	- trained using triplet loss
-	- factored prediction (predict for each host - makes it agnostic to num hosts)
-
-Autoregressive labelling: ! (Fault Score > POT and W' > W") -> means suddent upward spike.
-Downward spiked are not considered anomalous. If the above is true then NAP is ground-truth else the kP
-class to which the prediction is closest.
-
-Testing. At test time we dont have W' so we use co-simulated self-supervision to generate W' and then the 
-fault score. Also, we dont want to consider those hosts which have downward spikes. So we calculate
-fault-score for each host i. And take dot-product with ReLU (W' > W").
-- loss = \Sum\_i (MSE(W'\_i, W"\_i) + Delta(P - NAP)\_i)) . ReLU(W'\_i > W"\_i)
-- S <- S - gamma * Nabla_S (loss)
-
-Run till convergence or Fault Score < threshold.
-
-## Implementation Details
-
-- Each prototype is (mu, sigma) as NAP is much more dense than other classes. Thus, we use Bregmann distance as
-our Delta function in the triplet loss and the optimization loss.
-
-## Figures and Comparisons
-
-- @Model Diagram (Figure): SE, SD, DE, PEN.
-
-- @System model
-
-- @Visualization of attention scores (Plot):
-	- Truncated (say 3 dimensions time-series data)
-	- True series, Predicted Series, True Anomaly
-	- Colormap of attention scores
-	- Anomaly Scores and anomaly predictions
-
-- @RPi Cluster
-
-- @tSNE visualization of class prototypes (Plot):
-	- For different values of k
-
-- @Loss and accuracy curves for DeepFT Model (Plot) with iterations:
-	- Anomaly prediction score
-	- P, R, F1
-	- HitRate, NDCG
-
-- @Decrease and convergence of the optimization loss (GIF):
-	- Reduction in optimization loss, change in prototype vector (with iterations)
-
-- @Performance Scores (Table):
-	- Acc, P, R, F1, HR, NDCG, Improvement Ratio, Overhead ratio
-
-- @QoS Plots (Plot):
-	- Response time, energy, sla, preemptive migrations, anomalies (each class). Overheads.
-
-- Ablation Study (Table):
-	- F1, Improvement Ratio, SLA-v, Energy
-	- wo PEN, k = 1, wo stochastic prototype, wo DE
-
-- @Senstivity Analysis of QoS using simulator (Plot) :
-	- QoS with workloads. (energy, sla, Improvement ratio, f1)
-
-- Sensitivity Analysis of Detection using simulator (Plots) :
-	- detection/diagnosis/classification with window size, prototype dimension, k, factor.
-
+```
 
 ## License
 
 BSD-3-Clause. 
-Copyright (c) 2021, Shreshth Tuli.
+Copyright (c) 2022, Shreshth Tuli.
 All rights reserved.
 
 See License file for more details.
